@@ -1,0 +1,20 @@
+- name: Configure EKS Monitoring
+  hosts: control
+  become: yes
+  roles:
+    - eks-tools
+    - docker-monitoring
+    - helm-prometheus
+
+  post_tasks:
+    - name: Get Grafana credentials
+      command: kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 -d
+      register: grafana_password
+      changed_when: false
+
+    - name: Show Grafana credentials
+      debug:
+        msg: |
+          Grafana URL: http://$(kubectl get svc -n monitoring prometheus-grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          Username: admin
+          Password: {{ grafana_password.stdout }}

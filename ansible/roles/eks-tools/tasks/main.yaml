@@ -1,0 +1,32 @@
+- name: Install required system packages
+  apt:
+    name: 
+      - curl
+      - software-properties-common
+      - apt-transport-https
+      - gnupg
+    state: present
+    update_cache: yes
+
+- name: Install kubectl
+  apt:
+    name: kubectl
+    state: present
+
+- name: Download eksctl
+  get_url:
+    url: https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_linux_amd64.tar.gz
+    dest: /tmp/eksctl.tar.gz
+    mode: '0755'
+
+- name: Install eksctl
+  unarchive:
+    src: /tmp/eksctl.tar.gz
+    dest: /usr/local/bin
+    remote_src: yes
+    mode: '0755'
+
+- name: Install Helm
+  shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    executable: /bin/bash

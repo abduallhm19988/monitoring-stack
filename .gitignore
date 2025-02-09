@@ -1,0 +1,15 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+# Ansible
+*.retry
+ansible.cfg
+# General
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+*.log
+*.tmp

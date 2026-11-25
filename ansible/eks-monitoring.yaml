@@ -7,14 +7,23 @@
     - helm-prometheus
 
   post_tasks:
-    - name: Get Grafana credentials
-      command: kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 -d
-      register: grafana_password
+    - name: Read Grafana LoadBalancer hostname
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - service
+          - prometheus-grafana
+          - -n
+          - monitoring
+          - -o
+          - jsonpath={.status.loadBalancer.ingress[0].hostname}
+      register: grafana_hostname
       changed_when: false
 
-    - name: Show Grafana credentials
-      debug:
-        msg: |
-          Grafana URL: http://$(kubectl get svc -n monitoring prometheus-grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-          Username: admin
-          Password: {{ grafana_password.stdout }}
+    - name: Show Grafana access information without exposing credentials
+      ansible.builtin.debug:
+        msg:
+          - "Grafana URL: http://{{ grafana_hostname.stdout }}"
+          - "Username: admin"
+          - "Retrieve the initial password securely from the Kubernetes Secret on the control host; do not print it in shared logs."

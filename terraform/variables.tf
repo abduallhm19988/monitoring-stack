@@ -39,3 +39,13 @@ variable "node_group_name" {
   type        = string
   default     = "monitoring-nodes"
 }
+
+variable "admin_cidr" {
+  description = "Trusted administrator public IPv4 CIDR allowed to reach SSH and Grafana (for example, 203.0.113.10/32). Do not use 0.0.0.0/0."
+  type        = string
+
+  validation {
+    condition     = can(cidrhost(var.admin_cidr, 0)) && var.admin_cidr != "0.0.0.0/0"
+    error_message = "admin_cidr must be a valid, restricted IPv4 CIDR and must not be 0.0.0.0/0."
+  }
+}
